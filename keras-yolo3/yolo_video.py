@@ -3,9 +3,10 @@ import argparse
 from yolo import YOLO, detect_video
 from PIL import Image
 
-def detect_img(yolo):
+def detect_img(yolo, frame):
+    print("here")
     while True:
-        img = input('Input image filename:')
+        img = input(frame)
         try:
             image = Image.open(img)
         except:

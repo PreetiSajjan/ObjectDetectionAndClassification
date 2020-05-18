@@ -1,14 +1,13 @@
 import keras
-from keras.preprocessing import image
 import numpy as np
-import tensorflow as tf
-from keras.applications import imagenet_utils, MobileNetV2
-from keras.models import Model, Sequential
-from keras.layers import Dense, GlobalAveragePooling2D, Flatten
+from keras.applications import MobileNetV2
+from keras.layers import Dense, Flatten
+from keras.models import Sequential
+from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
-from keras.optimizers import Adam
-from keras.applications.mobilenet import preprocess_input
+import time
 
+from CarColour_Classifier import *
 
 def defmodel():
     base_model = MobileNetV2(weights='imagenet',
@@ -55,9 +54,9 @@ def defmodel():
 
 class CarType:
     def __init__(self):
-        # print("Init")
-        self.model, self.train_generator, self.validation_generator = defmodel()
-        self.fit()
+        # self.model, self.train_generator, self.validation_generator = defmodel()
+        # self.fit()
+        self.model_saved = keras.models.load_model('saved_model')
 
     def fit(self):
         # model, train_generator = defmodel()
@@ -69,13 +68,9 @@ class CarType:
                                  validation_data=self.validation_generator,
                                  validation_steps=step_size_val,
                                  # callbacks=callbacks_list,
-                                 epochs=20)
+                                 epochs=10)
+        self.model.save('saved_model')
 
-        tf.saved_model(self.model, 'saved_model')
-        # step_size_train = self.train_generator.n // self.train_generator.batch_size
-        # self.model.fit_generator(generator=self.train_generator,
-        #                         steps_per_epoch=step_size_train,
-        #                         epochs=2)
 
     def load_image(self, img_path):
         img = image.load_img(img_path, target_size=(180, 180))
@@ -86,18 +81,19 @@ class CarType:
 
         return img_tensor
 
-    def type_classifier(self, image_path):
-        model = keras.models.load_model('saved_model')
+    def type_classifier(self, image_path, frame, frame_n, max_car, bound):
         new_image = self.load_image(image_path)
-        pred = model.predict(new_image)
+        pred = self.model_saved.predict(new_image)
 
         rounded = float(np.round(pred))
-        print("\nPrediction: ", pred, rounded)
-        if rounded == 0.0:
-            return "Hatchback"
-        elif rounded == 1.0:
-            return "Sedan"
 
-        # p1 = [labels[np.argmax(pred)]]  # retrieving the max of the output
-        # print(pred, "\n", p1)
-        # Y_test1 = [labels[np.argmax(Y_test[i, :])] for i in range(Y_test.shape[0])]
+        # print("\nPrediction: ", pred, rounded)
+        if rounded == 0.0:
+            type = "Hatchback"
+        elif rounded == 1.0:
+            type = "Sedan"
+
+        TypeEnd = time.time()
+
+        ColEnd = ColourDetector(image_path, frame, frame_n, type, max_car, bound)
+        return TypeEnd, ColEnd

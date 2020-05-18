@@ -100,7 +100,6 @@ class YOLO(object):
         return boxes, scores, classes
 
     def detect_image(self, image):
-        start = timer()
 
         if self.model_image_size != (None, None):
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
@@ -170,11 +169,7 @@ class YOLO(object):
             del draw
             b_list.append(bounding)
 
-        end = timer()
-        #print(end - start)
-        #print("Boxes: ", len(out_boxes))
-        #print(top, bottom, left, right)
-        return image, b_list, end
+        return image, b_list
 
     def close_session(self):
         self.sess.close()

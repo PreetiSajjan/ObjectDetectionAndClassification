@@ -1,18 +1,25 @@
-import numpy as np
 import cv2
+import numpy as np
+from Results import Result
+import time
 
+# img_dir = "C:\\Users\\HP\\PycharmProjects\\MyProject\\ASSSSGGGGGG2\\keras-yolo3\\data" # Enter Directory of all images
+# data_path = os.path.join(img_dir,'*g')
+# files = glob.glob(data_path)
+res = Result()
 
-def ColourDetector(image):
-    Cols = []
-    Pred = {'Red': 0, 'Blue': 0, 'Black': 0, 'White': 0, 'Silver': 0}
-    new_image1 = cv2.imread(image)
+def ColourDetector(img_path, frame, frame_n, type, max_car, bound):
+    new_image1 = cv2.imread(img_path)
     boundaries = [
         ([17, 15, 100], [50, 56, 200]),  # Red
         ([86, 31, 4], [220, 88, 50]),  # Blue
-        ([0, 0, 0], [0, 0, 0]),  # Black
-        ([0, 0, 255], [255, 255, 255]),  # white
+        ([0, 0, 0], [180, 255, 30]),  # Black
+        ([0, 0, 200], [180, 20, 255]),  # white
         ([0, 0, 192], [192, 192, 192]),  # silver
     ]
+    Cols = []
+    DetectedColour = ()
+
     for (lower, upper) in boundaries:
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
@@ -21,14 +28,18 @@ def ColourDetector(image):
         Colour = np.sum(output)  # sum of all pixels
         Cols.append(Colour)
     col = np.argmax(Cols)  # Returns index of max element
+
     if col == 0:
-        Pred['Red'] += 1
+        DetectedColour = 'Red'
     if col == 1:
-        Pred['Blue'] += 1
+        DetectedColour = 'Blue'
     if col == 2:
-        Pred['Black'] += 1
+        DetectedColour = 'Black'
     if col == 3:
-        Pred['White'] += 1
+        DetectedColour = 'White'
     if col == 4:
-        Pred['Silver'] += 1
-    print("Colour: ", Pred)
+        DetectedColour = 'Silver'
+
+    ColEnd = time.time()
+    res.update_result(frame, frame_n, type, DetectedColour,  max_car, bound)
+    return ColEnd
