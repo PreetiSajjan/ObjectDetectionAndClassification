@@ -10,7 +10,6 @@ object_detector = Detector()
 
 # Read the video from specified path
 cam = cv2.VideoCapture("C:\\Users\\User\\PycharmProjects\\RTAIAssignment2\\keras-yolo3\\video.mp4")
-#cam = cv2.VideoCapture("C:\\Users\\User\\Desktop\\Experiment\\VIRAT.mp4")
 cam.set(cv2.CAP_PROP_FPS, 30)
 fps = cam.get(cv2.CAP_PROP_FPS)
 
